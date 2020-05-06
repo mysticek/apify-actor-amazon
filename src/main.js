@@ -17,10 +17,9 @@ Apify.main(async () => {
   if (!input || !input.sources)
     throw new Error('Input must be a JSON object with the "sources" field!');
 
-  const requestList = await Apify.openRequestList(
-    "my-request-list",
-    input.sources
-  );
+  const requestList = await Apify.RequestList({
+    sources: [{ requestFromUrl: input.sources.requestsFromUrl }],
+  });
 
   console.log(requestList);
   return;
