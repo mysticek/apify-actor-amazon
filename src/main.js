@@ -4,6 +4,7 @@
 
 // Include Apify SDK. For more information, see https://sdk.apify.com/
 const Apify = require("apify");
+const request = require("request-promise");
 const { csvJSON } = require("./helpers");
 
 Apify.main(async () => {
@@ -13,7 +14,7 @@ Apify.main(async () => {
   // For more information, see https://apify.com/docs/actor/input-schema
   const input = await Apify.getInput();
 
-  const csv = await Apify.request(input.sources.requestsFromUrl);
+  const csv = await request(input.sources.requestsFromUrl);
   const urls = csvJSON(csv.replace(/\"/g, ""));
   console.log(urls);
 
