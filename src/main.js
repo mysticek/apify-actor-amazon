@@ -4,6 +4,7 @@
 
 // Include Apify SDK. For more information, see https://sdk.apify.com/
 const Apify = require("apify");
+const { csvJSON } = require("./helpers");
 
 Apify.main(async () => {
   // Get input of the actor (here only for demonstration purposes).
@@ -11,17 +12,18 @@ Apify.main(async () => {
   // a user interface for it, add INPUT_SCHEMA.json file to your actor.
   // For more information, see https://apify.com/docs/actor/input-schema
   const input = await Apify.getInput();
-  console.log("Input:");
-  console.dir(input);
+
+  const csv = await Apify.request(input.sources.requestsFromUrl);
+  const urls = csvJSON(csv.replace(/\"/g, ""));
+  console.log(urls);
 
   if (!input || !input.sources)
     throw new Error('Input must be a JSON object with the "sources" field!');
 
-  const requestList = new Apify.RequestList({
-    sources: [{ requestFromUrl: input.sources.requestsFromUrl }],
-  });
-
-  await requestList.initialize();
+  const requestList = await Apify.openRequestList(
+    "my-request-list",
+    input.sources
+  );
 
   console.log(requestList);
   return;
