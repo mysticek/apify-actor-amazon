@@ -4,12 +4,12 @@
   "type": "object",
   "schemaVersion": 1,
   "properties": {
-    "startUrls": {
+    "sources": {
       "title": "Start URLs",
       "type": "array",
       "description": "URLs to start with",
       "editor": "requestListSources"
     }
   },
-  "required": ["startUrls"]
+  "required": ["sources"]
 }
