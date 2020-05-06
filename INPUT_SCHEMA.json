@@ -1,0 +1,6 @@
+{
+  "title": "Registryoffice - urls .csv file",
+  "type": "array",
+  "description": "URLs to start with",
+  "editor": "requestListSources"
+}
