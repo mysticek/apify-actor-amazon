@@ -2,5 +2,6 @@
   "title": "Registryoffice - urls .csv file",
   "type": "array",
   "description": "URLs to start with",
+  "prefill": [{ "url": "http://example.com" }],
   "editor": "requestListSources"
 }
