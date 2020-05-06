@@ -1,25 +1,19 @@
 {
-  "type": "array",
-  "prefill": [{ "url": "http://example.com" }],
-  "editor": "requestListSources"
-}
-
-{
-    "title": "Registryoffice - urls .csv file",
-    "description": "URLs to start with",
-    "type": "object",
-    "schemaVersion": 1,
-    "properties": {
-        "startUrls": {
-            "title": "Start URLs",
-            "type": "array",
-            "description": "URLs to start with",
-            "prefill": [
-                { "url": "http://example.com" },
-                { "url": "http://example.com/some-path" }
-            ],
-            "editor": "requestListSources"
-        },
-    },
-    "required": ["startUrls"]
+  "title": "Registryoffice - urls .csv file",
+  "description": "URLs to start with",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "startUrls": {
+      "title": "Start URLs",
+      "type": "array",
+      "description": "URLs to start with",
+      "prefill": [
+        { "url": "http://example.com" },
+        { "url": "http://example.com/some-path" }
+      ],
+      "editor": "requestListSources"
+    }
+  },
+  "required": ["startUrls"]
 }
