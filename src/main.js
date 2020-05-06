@@ -21,6 +21,8 @@ Apify.main(async () => {
     sources: [{ requestFromUrl: input.sources.requestsFromUrl }],
   });
 
+  await requestList.initialize();
+
   console.log(requestList);
   return;
 
