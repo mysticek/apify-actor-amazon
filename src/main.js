@@ -1,55 +1,99 @@
-// This is the main Node.js source code file of your actor.
-// It is referenced from the "scripts" section of the package.json file,
-// so that it can be started by running "npm start".
-
-// Include Apify SDK. For more information, see https://sdk.apify.com/
 const Apify = require("apify");
+const dns = require("dns").promises;
 const request = require("request-promise");
-const { csvJSON } = require("./helpers");
+const {
+  csvToArray,
+  normalizeOutput,
+  calculateResponseTime,
+} = require("./helpers");
 
 Apify.main(async () => {
-  // Get input of the actor (here only for demonstration purposes).
-  // If you'd like to have your input checked and have Apify display
-  // a user interface for it, add INPUT_SCHEMA.json file to your actor.
-  // For more information, see https://apify.com/docs/actor/input-schema
+  const DOMAINS_COUNT = 30;
+
   const input = await Apify.getInput();
 
-  const csv = await request(input.sources.requestsFromUrl);
-  const urls = csvJSON(csv.replace(/\"/g, ""));
-  console.log(urls);
-
-  if (!input || !input.sources)
-    throw new Error('Input must be a JSON object with the "sources" field!');
-
-  const requestList = await Apify.openRequestList(
-    "my-request-list",
-    input.sources
+  const csv = await request(
+    "https://apify-uploads-prod.s3.amazonaws.com/WoHcDsskx6ERGKznw-XkfjWEqPMiZxDkrZo-2020-04-27_dot_blog_zone_dums_180306_%282%29.csv"
   );
 
-  console.log(requestList);
-  return;
+  const urls = csvToArray(csv, DOMAINS_COUNT);
+  const requestList = await Apify.openRequestList("my-request-list", urls);
+
+  const results = [];
 
   // Create a basic crawler that will use request-promise to download
   // web pages from a given list of URLs
   const basicCrawler = new Apify.BasicCrawler({
     requestList,
+    maxRequestRetries: 1,
     handleRequestFunction: async ({ request }) => {
-      const { body } = await Apify.utils.requestAsBrowser({ url: request.url });
-      await Apify.pushData({
-        request,
-        finishedAt: new Date(),
-        html: body,
-        "#debug": Apify.utils.createRequestDebugInfo(request),
+      const {
+        body,
+        request: req,
+        statusCode,
+        timings,
+      } = await Apify.utils.requestAsBrowser({
+        url: request.url,
       });
+
+      let request_ipv4,
+        request_ipv6 = null;
+
+      const { family, address } = await dns.lookup(request.url);
+
+      switch (family) {
+        case 4:
+          request_ipv4 = address;
+          break;
+        case 6:
+          request_ipv6 = address;
+          break;
+        default:
+          break;
+      }
+
+      results.push(
+        normalizeOutput({
+          body,
+          crawlStatus: "ok",
+          crawlStatusMessage: null,
+          request_hostname: req.gotOptions.hostname,
+          request_ipv4,
+          request_ipv6,
+          response_code: statusCode,
+          response_time: calculateResponseTime(timings.start, timings.response),
+        })
+      );
     },
 
-    handleFailedRequestFunction: async ({ request }) => {
-      await Apify.pushData({
-        "#isFailed": true,
-        "#debug": Apify.utils.createRequestDebugInfo(request),
+    handleFailedRequestFunction: async ({ request, error }) => {
+      const { name: errorName, gotOptions, statusCode } = error;
+
+      console.log("request ---- ");
+      console.log(request);
+      return;
+
+      console.log("Crawl error...");
+
+      let request_ipv4, request_ipv6;
+
+      return;
+
+      results.push({
+        body: null,
+        crawlStatus: "error",
+        crawlStatusMessage: errorName,
+        request_hostname: gotOptions.hostname,
+        request_ipv4,
+        request_ipv6,
+        response_code: statusCode,
+        response_time: null,
       });
     },
   });
 
   await basicCrawler.run();
+
+  // return array of JSON objects
+  await Apify.pushData(results);
 });
