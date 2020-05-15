@@ -112,7 +112,7 @@ const puppeteerCrawler = async (requestList) => {
           })
         );
       } catch (e) {
-        const { hostname, code, syscall: errorMessage } = e;
+        const { code, syscall: errorMessage } = e;
         results.push(
           normalizeOutput({
             crawlStatus: "error",

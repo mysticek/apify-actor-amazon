@@ -110,8 +110,6 @@ const basicCrawler = async (requestList, RETRY_COUNT) => {
           })
         );
       } catch (e) {
-        console.log(e);
-        return;
         const { name: errorMessage, hostname, code } = e;
         results.push(
           normalizeOutput({
