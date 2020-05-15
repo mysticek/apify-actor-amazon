@@ -13,6 +13,8 @@ Apify.main(async () => {
   console.log(input.sources);
   console.log(input.sources[0]);
 
+  return;
+
   const DOMAINS_URL = input.sources[0].requestFromUrl;
   const DOMAINS_COUNT = parseInt(input.domainsCount);
   const RETRY_COUNT = 3;
