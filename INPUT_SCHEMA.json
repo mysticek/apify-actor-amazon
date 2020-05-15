@@ -6,7 +6,7 @@
   "properties": {
     "sources": {
       "title": "Start URLs",
-      "type": "array",
+      "type": "object",
       "description": "URLs to start with",
       "editor": "requestListSources"
     },

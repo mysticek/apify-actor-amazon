@@ -12,7 +12,7 @@ const csvToArray = (csv, count = false) => {
   );
 
   if (count) {
-    result = result.slice(15000, 15000 + count);
+    result = result.slice(0, count);
   }
 
   return result;
