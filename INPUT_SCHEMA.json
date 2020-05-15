@@ -1,6 +1,6 @@
 {
-  "title": "Registryoffice - urls .csv file",
-  "description": "URLs to start with",
+  "title": "Registryoffice - crawling domains",
+  "description": "Registryoffice",
   "type": "object",
   "schemaVersion": 1,
   "properties": {
@@ -9,7 +9,21 @@
       "type": "array",
       "description": "URLs to start with",
       "editor": "requestListSources"
+    },
+    "domainsCount": {
+      "title": "Domains count",
+      "type": "integer",
+      "description": "How many domains crawl?",
+      "editor": "textfield"
+    },
+    "crawlerType": {
+      "title": "Crawler Type",
+      "type": "string",
+      "description": "Crawler type to use",
+      "default": "basic",
+      "enum": ["basic", "puppeteer"],
+      "enumTitles": ["Basic", "Puppeteer"]
     }
   },
-  "required": ["sources"]
+  "required": ["sources", "domainsCount", "crawlerType"]
 }

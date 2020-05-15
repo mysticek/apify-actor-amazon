@@ -12,7 +12,7 @@ const csvToArray = (csv, count = false) => {
   );
 
   if (count) {
-    result = result.slice(10, count);
+    result = result.slice(15000, 15000 + count);
   }
 
   return result;
@@ -29,6 +29,17 @@ const calculateResponseTime = (start, response) => {
   return parseFloat((diff / 1000) % 60);
 };
 
+const normalizeHostname = (hostname) =>
+  hostname.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").replace(/\/+$/, "");
+
+const isRedirectedToHttps = (origin, target) => {
+  if (normalizeHostname(origin) === normalizeHostname(target)) {
+    return target.indexOf("https://") == 0;
+  }
+
+  return false;
+};
+
 const normalizeOutput = ({
   body = null,
   crawlStatus,
@@ -38,18 +49,33 @@ const normalizeOutput = ({
   request_ipv6,
   response_code,
   response_time,
+  redirect,
+  header,
+  port_443,
+  port_80,
+  https_redirect,
 }) => {
   return {
     time: new Date().getTime(),
     doc: body,
     status: crawlStatus,
     status_message: crawlStatusMessage,
-    request_hostname,
+    request_hostname: normalizeHostname(request_hostname),
     request_ipv4,
     request_ipv6,
     response_code,
     response_time,
+    header,
+    port_443,
+    port_80,
+    redirect,
+    https_redirect,
   };
 };
 
-module.exports = { csvToArray, normalizeOutput, calculateResponseTime };
+module.exports = {
+  csvToArray,
+  normalizeOutput,
+  calculateResponseTime,
+  isRedirectedToHttps,
+};
