@@ -14,8 +14,6 @@ Apify.main(async () => {
   const RETRY_COUNT = 3;
   const CRAWLER_TYPE = input.crawlerType;
 
-  const input = await Apify.getInput();
-
   const csv = await request(DOMAINS_URL);
 
   const urls = csvToArray(csv, DOMAINS_COUNT);
