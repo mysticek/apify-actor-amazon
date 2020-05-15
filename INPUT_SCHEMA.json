@@ -13,8 +13,7 @@
     "domainsCount": {
       "title": "Domains count",
       "type": "integer",
-      "description": "How many domains crawl?",
-      "editor": "textfield"
+      "description": "How many domains crawl?"
     },
     "crawlerType": {
       "title": "Crawler Type",
