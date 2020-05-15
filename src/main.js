@@ -9,6 +9,10 @@ let results;
 Apify.main(async () => {
   const input = await Apify.getInput();
 
+  console.log(input);
+  console.log(input.sources);
+  console.log(input.sources[0]);
+
   const DOMAINS_URL = input.sources[0].requestFromUrl;
   const DOMAINS_COUNT = parseInt(input.domainsCount);
   const RETRY_COUNT = 3;
