@@ -7,12 +7,16 @@ const {
 } = require("../helpers");
 
 const basicCrawler = async (requestList, RETRY_COUNT) => {
-  const results = [];
+  let blocked = {};
 
   const basicCrawler = new Apify.BasicCrawler({
     requestList,
     maxRequestRetries: RETRY_COUNT,
     handleRequestFunction: async ({ request }) => {
+      if (!blocked[request.url]) {
+        blocked[request.url] = [];
+      }
+
       try {
         let request_ipv4,
           request_ipv6 = null;
@@ -89,7 +93,21 @@ const basicCrawler = async (requestList, RETRY_COUNT) => {
           }
         }
 
-        results.push(
+        if (httpsStatusCode > 400) {
+          blocked[request.url].push({
+            time: new Date().getTime(),
+            response_code: httpsStatusCode,
+          });
+        }
+
+        if (statusCode > 400) {
+          blocked[request.url].push({
+            time: new Date().getTime(),
+            response_code: statusCode,
+          });
+        }
+
+        await Apify.pushData(
           normalizeOutput({
             body,
             crawlStatus: "ok",
@@ -107,15 +125,17 @@ const basicCrawler = async (requestList, RETRY_COUNT) => {
             https_redirect: redirectedToHttps,
             redirect,
             header: headers,
+            blocked: blocked[request.url],
           })
         );
       } catch (e) {
         const { name: errorMessage, hostname, code } = e;
-        results.push(
+        await Apify.pushData(
           normalizeOutput({
             crawlStatus: "error",
             crawlStatusMessage: `${errorMessage} ${code ? `(${code})` : ""}`,
             request_hostname: hostname,
+            blocked: blocked[request.url],
           })
         );
       }
@@ -123,8 +143,6 @@ const basicCrawler = async (requestList, RETRY_COUNT) => {
   });
 
   await basicCrawler.run();
-
-  return results;
 };
 
 module.exports = { basicCrawler };

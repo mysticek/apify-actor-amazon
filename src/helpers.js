@@ -54,6 +54,7 @@ const normalizeOutput = ({
   port_443,
   port_80,
   https_redirect,
+  blocked,
 }) => {
   return {
     time: new Date().getTime(),
@@ -70,6 +71,7 @@ const normalizeOutput = ({
     port_80,
     redirect,
     https_redirect,
+    blocked,
   };
 };
 

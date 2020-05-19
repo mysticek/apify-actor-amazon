@@ -7,37 +7,67 @@ const {
 } = require("../helpers");
 
 const puppeteerCrawler = async (requestList) => {
-  const results = [];
+  let request_ipv4,
+    request_ipv6 = null;
+  let dnsExists = false;
+
+  let blocked = {};
 
   const crawler = new Apify.PuppeteerCrawler({
     requestList,
     launchPuppeteerOptions: { headless: true },
-    handlePageFunction: async ({ page, request, response }) => {
+    handlePageTimeoutSecs: 200,
+    gotoFunction: async ({ request, page, puppeteerPool }) => {
       await page.setDefaultNavigationTimeout(0);
-      const redirectUrlsChain = response.request().redirectChain();
-      const redirectUrls = redirectUrlsChain.map((obj) => obj.url);
-      const statusMessage = response.statusText();
-      const timings = JSON.parse(
-        await page.evaluate(() => JSON.stringify(window.performance))
-      ).timing;
 
       try {
-        let request_ipv4,
-          request_ipv6 = null;
-
-        // jump to catch error if domain not found before crawling
         const { family, address } = await dns.lookup(request.url);
 
         switch (family) {
           case 4:
             request_ipv4 = address;
+            dnsExists = true;
             break;
           case 6:
             request_ipv6 = address;
+            dnsExists = true;
             break;
           default:
+            dnsExists = false;
             break;
         }
+      } catch (e) {
+        request.retryCount = 3;
+        throw `DNS not found for url: ${request.url}`;
+      }
+
+      if (dnsExists) {
+        const response = page.goto(request.url);
+        return response;
+      } else return null;
+    },
+    handlePageFunction: async ({ page, request, response }) => {
+      if (!blocked[request.url]) {
+        blocked[request.url] = [];
+      }
+
+      await page.setDefaultNavigationTimeout(0);
+      try {
+        if (!dnsExists) {
+          throw new Error("Domain not found");
+        }
+
+        const redirectUrls = [];
+        const redirectUrlsChain = response.request().redirectChain();
+        redirectUrlsChain.forEach((obj) => {
+          if (obj.url() !== request.url && obj.url() !== request.url + "/")
+            redirectUrls.push(obj.url());
+        });
+
+        const statusMessage = response.statusText();
+        const timings = JSON.parse(
+          await page.evaluate(() => JSON.stringify(window.performance))
+        ).timing;
 
         // fill redirect array with redirect urls
         const redirect = [];
@@ -73,6 +103,13 @@ const puppeteerCrawler = async (requestList) => {
         const statusCode = response.status();
         const hostname = response.url();
 
+        if (statusCode > 400) {
+          blocked[request.url].push({
+            time: new Date().getTime(),
+            response_code: statusCode,
+          });
+        }
+
         // check if website was redirected to https protocol
         let httpsSupport = false;
         let redirectedToHttps = false;
@@ -89,9 +126,16 @@ const puppeteerCrawler = async (requestList) => {
           if (httpsStatusCode === 200) {
             httpsSupport = true;
           }
+
+          if (httpsStatusCode > 400) {
+            blocked[request.url].push({
+              time: new Date().getTime(),
+              response_code: httpsStatusCode,
+            });
+          }
         }
 
-        results.push(
+        await Apify.pushData(
           normalizeOutput({
             body,
             crawlStatus: "ok",
@@ -109,15 +153,16 @@ const puppeteerCrawler = async (requestList) => {
             https_redirect: redirectedToHttps,
             redirect,
             header: headers,
+            blocked: blocked[request.url],
           })
         );
       } catch (e) {
-        const { code, syscall: errorMessage } = e;
-        results.push(
+        await Apify.pushData(
           normalizeOutput({
             crawlStatus: "error",
-            crawlStatusMessage: `${errorMessage} ${code ? `(${code})` : ""}`,
+            crawlStatusMessage: e,
             request_hostname: request.url,
+            blocked: blocked[request.url],
           })
         );
       }
@@ -125,8 +170,6 @@ const puppeteerCrawler = async (requestList) => {
   });
 
   await crawler.run();
-
-  return results;
 };
 
 module.exports = { puppeteerCrawler };
