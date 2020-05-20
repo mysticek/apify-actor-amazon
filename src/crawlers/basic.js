@@ -4,6 +4,7 @@ const {
   normalizeOutput,
   calculateResponseTime,
   isRedirectedToHttps,
+  normalizeHostname,
 } = require("../helpers");
 
 const basicCrawler = async (requestList, RETRY_COUNT) => {
@@ -22,7 +23,9 @@ const basicCrawler = async (requestList, RETRY_COUNT) => {
           request_ipv6 = null;
 
         // jump to catch error if domain not found before crawling
-        const { family, address } = await dns.lookup(request.url);
+        const { family, address } = await dns.lookup(
+          normalizeHostname(request.url)
+        );
 
         switch (family) {
           case 4:

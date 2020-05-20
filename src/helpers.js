@@ -80,4 +80,5 @@ module.exports = {
   normalizeOutput,
   calculateResponseTime,
   isRedirectedToHttps,
+  normalizeHostname,
 };

@@ -4,6 +4,7 @@ const {
   normalizeOutput,
   calculateResponseTime,
   isRedirectedToHttps,
+  normalizeHostname,
 } = require("../helpers");
 
 const puppeteerCrawler = async (requestList) => {
@@ -22,7 +23,9 @@ const puppeteerCrawler = async (requestList) => {
       const dnsNotFoundDomains = [];
 
       try {
-        const { family, address } = await dns.lookup(request.url);
+        const { family, address } = await dns.lookup(
+          normalizeHostname(request.url)
+        );
 
         switch (family) {
           case 4:
