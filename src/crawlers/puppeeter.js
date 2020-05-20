@@ -38,9 +38,6 @@ const puppeteerCrawler = async (requestList) => {
             break;
         }
       } catch (e) {
-        console.log("DNS lookup error");
-        console.log(e);
-        console.log(family);
         request.retryCount = 3;
         if (dnsNotFoundDomains.includes(request.url)) {
           return;
