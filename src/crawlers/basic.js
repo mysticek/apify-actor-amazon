@@ -129,12 +129,12 @@ const basicCrawler = async (requestList, RETRY_COUNT) => {
           })
         );
       } catch (e) {
-        const { name: errorMessage, hostname, code } = e;
+        const { name: errorMessage, code } = e;
         await Apify.pushData(
           normalizeOutput({
             crawlStatus: "error",
             crawlStatusMessage: `${errorMessage} ${code ? `(${code})` : ""}`,
-            request_hostname: hostname,
+            request_hostname: request.url,
             blocked: blocked[request.url],
           })
         );

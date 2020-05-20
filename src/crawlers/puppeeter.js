@@ -19,6 +19,7 @@ const puppeteerCrawler = async (requestList) => {
     handlePageTimeoutSecs: 200,
     gotoFunction: async ({ request, page, puppeteerPool }) => {
       await page.setDefaultNavigationTimeout(0);
+      const dnsNotFoundDomains = [];
 
       try {
         const { family, address } = await dns.lookup(request.url);
@@ -38,7 +39,19 @@ const puppeteerCrawler = async (requestList) => {
         }
       } catch (e) {
         request.retryCount = 3;
-        throw `DNS not found for url: ${request.url}`;
+        if (dnsNotFoundDomains.includes(request.url)) {
+          return;
+        } else {
+          dnsNotFoundDomains.push(request.url);
+          await Apify.pushData(
+            normalizeOutput({
+              crawlStatus: "error",
+              crawlStatusMessage: "DNS not found",
+              request_hostname: request.url,
+            })
+          );
+          throw `DNS not found for url: ${request.url}`;
+        }
       }
 
       if (dnsExists) {
