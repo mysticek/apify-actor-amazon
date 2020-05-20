@@ -7,21 +7,13 @@ const csvToArray = (csv, count = false) => {
   result = result.filter((res) => res !== "");
 
   // format url to force http:// protocol
-  result = result.map((str) =>
-    startAsWebsite(str) ? str : `http://www.${str}`
-  );
+  result = result.map((str) => "http://" + str);
 
   if (count) {
     result = result.slice(0, count);
   }
 
   return result;
-};
-
-// test if domain name from csv is in correct format
-const startAsWebsite = (str) => {
-  const re = new RegExp("^www?.", "i");
-  return re.test(str);
 };
 
 const calculateResponseTime = (start, response) => {

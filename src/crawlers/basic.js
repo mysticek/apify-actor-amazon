@@ -85,11 +85,15 @@ const basicCrawler = async (requestList, RETRY_COUNT) => {
           redirectedToHttps = isRedirectedToHttps(request.url, redirectUrls[0]);
 
         if (!redirectedToHttps) {
-          const {
-            statusCode: httpsStatusCode,
-          } = await Apify.utils.requestAsBrowser({
-            url: request.url.replace("http", "https"),
-          });
+          try {
+            var {
+              statusCode: httpsStatusCode,
+            } = await Apify.utils.requestAsBrowser({
+              url: "https://" + request.url,
+            });
+          } catch (e) {
+            return;
+          }
 
           if (httpsStatusCode === 200) {
             httpsSupport = true;

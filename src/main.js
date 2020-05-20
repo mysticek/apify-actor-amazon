@@ -20,7 +20,7 @@ Apify.main(async () => {
   } else {
     DOMAINS_COUNT = 50;
     RETRY_COUNT = 3;
-    CRAWLER_TYPE = "basic";
+    CRAWLER_TYPE = "p";
     csv = await request(
       "https://apify-uploads-prod.s3.amazonaws.com/WoHcDsskx6ERGKznw-XkfjWEqPMiZxDkrZo-2020-04-27_dot_blog_zone_dums_180306_%282%29.csv"
     );
