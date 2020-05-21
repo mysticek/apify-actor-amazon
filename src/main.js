@@ -5,7 +5,7 @@ const { basicCrawler } = require("./crawlers/basic");
 const { puppeteerCrawler } = require("./crawlers/puppeeter");
 
 // set ENV to production before build to apify
-const ENV = "production";
+const ENV = "dev";
 
 Apify.main(async () => {
   let DOMAINS_COUNT, DOMAINS_URL, RETRY_COUNT, CRAWLER_TYPE, csv;
@@ -20,13 +20,13 @@ Apify.main(async () => {
   } else {
     DOMAINS_COUNT = 50;
     RETRY_COUNT = 3;
-    CRAWLER_TYPE = "p";
+    CRAWLER_TYPE = "basic";
     csv = await request(
       "https://apify-uploads-prod.s3.amazonaws.com/WoHcDsskx6ERGKznw-XkfjWEqPMiZxDkrZo-2020-04-27_dot_blog_zone_dums_180306_%282%29.csv"
     );
   }
 
-  const urls = csvToArray(csv, DOMAINS_COUNT);
+  let urls = csvToArray(csv, DOMAINS_COUNT);
   const requestList = await Apify.openRequestList("my-request-list", urls);
 
   if (CRAWLER_TYPE === "basic") {

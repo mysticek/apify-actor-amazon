@@ -6,6 +6,7 @@ const {
   isRedirectedToHttps,
   normalizeHostname,
 } = require("../helpers");
+const httpRequest = require("@apify/http-request");
 
 const basicCrawler = async (requestList, RETRY_COUNT) => {
   let blocked = {};
@@ -46,7 +47,7 @@ const basicCrawler = async (requestList, RETRY_COUNT) => {
           statusMessage,
           redirectUrls,
           headers,
-        } = await Apify.utils.requestAsBrowser({
+        } = await httpRequest({
           url: request.url,
         });
 
@@ -85,15 +86,9 @@ const basicCrawler = async (requestList, RETRY_COUNT) => {
           redirectedToHttps = isRedirectedToHttps(request.url, redirectUrls[0]);
 
         if (!redirectedToHttps) {
-          try {
-            var {
-              statusCode: httpsStatusCode,
-            } = await Apify.utils.requestAsBrowser({
-              url: "https://" + request.url,
-            });
-          } catch (e) {
-            return;
-          }
+          var { statusCode: httpsStatusCode } = await httpRequest({
+            url: "https://" + request.url,
+          });
 
           if (httpsStatusCode === 200) {
             httpsSupport = true;
