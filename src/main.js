@@ -5,7 +5,7 @@ const { basicCrawler } = require("./crawlers/basic");
 const { puppeteerCrawler } = require("./crawlers/puppeeter");
 
 // set ENV to production before build to apify
-const ENV = "dev";
+const ENV = "production";
 
 Apify.main(async () => {
   let DOMAINS_COUNT, DOMAINS_URL, RETRY_COUNT, CRAWLER_TYPE, csv;
