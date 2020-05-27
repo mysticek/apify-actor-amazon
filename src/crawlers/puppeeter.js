@@ -43,6 +43,7 @@ const puppeteerCrawler = async (requestList) => {
       } catch (e) {
         request.retryCount = 3;
         if (dnsNotFoundDomains.includes(request.url)) {
+          console.log("deje sa to");
           return;
         } else {
           dnsNotFoundDomains.push(request.url);
@@ -60,7 +61,15 @@ const puppeteerCrawler = async (requestList) => {
       if (dnsExists) {
         const response = page.goto(request.url);
         return response;
-      } else return null;
+      } else
+        await Apify.pushData(
+          normalizeOutput({
+            crawlStatus: "error",
+            crawlStatusMessage: "DNS not found",
+            request_hostname: request.url,
+          })
+        );
+      throw `DNS not found for url: ${request.url}`;
     },
     handlePageFunction: async ({ page, request, response }) => {
       if (!blocked[request.url]) {
