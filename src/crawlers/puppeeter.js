@@ -79,6 +79,14 @@ const puppeteerCrawler = async (requestList) => {
       await page.setDefaultNavigationTimeout(0);
       try {
         if (!dnsExists) {
+          await Apify.pushData(
+            normalizeOutput({
+              crawlStatus: "error",
+              crawlStatusMessage: "DNS not found",
+              request_hostname: request.url,
+            })
+          );
+
           throw new Error("Domain not found");
         }
 
