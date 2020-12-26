@@ -1,16 +1,16 @@
 {
-  "name": "registryoffice-apify-scraper",
+  "name": "amazon-exercise-crawler",
   "version": "0.0.1",
   "description": "This is a boilerplate of an Apify actor.",
   "dependencies": {
     "@apify/http-request": "^1.2.0",
-    "apify": "^0.20.2",
-    "request-promise": "^4.2.5",
-    "whois": "^2.12.1"
+    "apify": "^0.21",
+    "request-promise": "^4.2.6",
+    "whois": "^2.13.3"
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node ./src/main.js",
+    "start": "node ./src/main.js --p",
     "test": "echo \"Error: oops, the actor has no tests yet, sad!\" && exit 1"
   },
   "author": "BOOTIQ s.r.o.",

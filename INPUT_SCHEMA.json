@@ -1,28 +1,15 @@
 {
-  "title": "Registryoffice - crawling domains",
-  "description": "Registryoffice",
+  "title": "Amazon - exercise",
+  "description": "tutorial",
   "type": "object",
   "schemaVersion": 1,
   "properties": {
-    "sources": {
-      "title": "Start URLs",
-      "type": "array",
-      "description": "URLs to start with",
-      "editor": "requestListSources"
-    },
-    "domainsCount": {
-      "title": "Domains count",
-      "type": "integer",
-      "description": "How many domains crawl?"
-    },
-    "crawlerType": {
-      "title": "Crawler Type",
+    "keyword": {
+      "title": "Keyword",
       "type": "string",
-      "description": "Crawler type to use",
-      "default": "basic",
-      "enum": ["basic", "puppeteer"],
-      "enumTitles": ["Basic", "Puppeteer"]
+      "description": "why is description required?",
+      "editor": "textfield"
     }
   },
-  "required": ["sources", "domainsCount", "crawlerType"]
+  "required": ["keyword"]
 }
